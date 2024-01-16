@@ -1,0 +1,24 @@
+{
+    "id": "3E042B45",
+    "path": "C:/Users/caisy/OneDrive/genentic statistics/data/Faster simex simulation.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "3326517903",
+    "contents": "",
+    "dirty": false,
+    "created": 1633952033218.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "65,26",
+        "scrollLine": "56"
+    },
+    "folds": "9|1|14|0|\n17|1|22|0|\n25|1|30|0|\n33|1|40|0|\n",
+    "lastKnownWriteTime": 1633561283,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1633952118164,
+    "read_only": false,
+    "read_only_alternatives": []
+}

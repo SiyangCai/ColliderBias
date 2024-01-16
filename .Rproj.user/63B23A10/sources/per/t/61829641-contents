@@ -1,0 +1,328 @@
+#R-sq>0.98
+IPF_0.98 <- read.csv("C:/Users/caisy/Desktop/index event/IPF_prune0.98_noNA", sep="")
+attach(IPF_0.98)
+
+#Weighted linear regression
+test0.98<-glm(coef_0.98~beta_0.98)
+summary(test0.98)
+confint(test0.98, 'beta_0.98', level=0.95)
+#coef= -0.0004213 with weights, se = 0.0039493, CI = (-0.008161696, 0.007319134)
+#coef= -0.0083803 without weights, se = 0.0040640, CI =(-0.0163455180, -0.0004150052 )
+
+test0.98<-glm(coef_0.98cor~beta_0.98)
+summary(test0.98)#coef= 0.0175485 without weights, coef= 0.0155620 with weights, coef= 0.0071133 with weights se.coef
+confint(test0.98, 'beta_0.98', level=0.95)
+
+test0.98<-glm(coef_0.98~beta_0.98cor, weights = 1/se.coef_0.98^2)
+summary(test0.98)#coef= 0.0154735 without weights, coef= 0.0152012 with weights, coef= 0.0047270 with weights se.coef
+confint(test0.98, 'beta_0.98cor', level=0.95)
+
+plot(beta_0.98cor,coef_0.98)
+abline(test0.98)
+#plot(test0.98)
+
+#Index event package
+indexevent(beta_0.98, se.beta_0.98, coef_0.98,se.coef_0.98, weighted = FALSE)
+#coef= 0.0316447098106534 with weights, coef= 0.62948644471083 without weights
+
+indexevent(beta_0.98, se.beta_0.98, coef_0.98cor,se.coef_0.98)
+#coef= -1.31816488825565 without weights, coef= -0.534319206083867 with weights
+
+indexevent(beta_0.98cor,se.beta_0.98, coef_0.98,se.coef_0.98)
+#coef= -1.17575628247568 without weights, coef= -0.359181947599928 with weights
+
+
+#SIMEX
+indexevent(beta_0.98, se.beta_0.98, coef_0.98,se.coef_0.98, method= "SIMEX", B=100, weighted = FALSE)
+#coef= -11.3749124614817, se= 3.15788874248839, 95% CI= (-12.3824476516351, -0.00375124671168972) with weights
+#coef= -0.281399720325601, se= 25.5030241578928, 95% CI= (-99.9999302250119, -0.029912532362455) without weights
+
+indexevent(beta_0.98,se.beta_0.98, coef_0.98cor,se.coef_0.98, method= "SIMEX", B=100)
+#coef= 99.999949738763, se= 25.419716519207, 95% CI= (0.356511187120146, 99.9999689368472) with weights
+#coef= 99.9999187792796, se= 25.4603645581256, 95% CI= (0.1971546684618, 99.9999498028342) without weights
+
+indexevent(beta_0.98cor,se.beta_0.98, coef_0.98,se.coef_0.98, method= "SIMEX", B=100)
+#coef= 0.0635278961342669, se= 0.0392595468515887, 95% CI= (0.0378451030873078, 0.191739698844261) with weights
+#coef= 99.9999179328901, se= 25.4723499004508, 95% CI= (0.150172466764599, 99.9999492797367) without weights
+
+
+#Fast simex & HO
+new_simex(beta_0.98, se.beta_0.98, coef_0.98, se.coef_0.98, weighted= "1", method= "hedges-olkin", model = "ivw")
+# coef = 0.6877701
+
+
+#Slope hunter updated
+Sh0.98 <- hunt(dat = IPF_0.98, 
+               xbeta_col="beta_0.98", xse_col="se.beta_0.98", xp_col= "p.beta_0.98",
+               ybeta_col="coef_0.98", yse_col="se.coef_0.98", yp_col="p.coef_0.98",
+               xp_thresh = 0.05, Bootstrapping = TRUE, show_adjustments = TRUE, seed=2019)
+# coef = 0.422460473051088, se = 0.0577789652740738
+
+
+#MR-RAPS
+mr.raps(beta_0.98, coef_0.98, se.beta_0.98, se.coef_0.98, over.dispersion = TRUE)
+# coef = -17.23309, se = 994.418
+
+
+#Radial IVW package
+IPF_IVW0.98<-format_radial(beta_0.98, coef_0.98, se.beta_0.98, se.coef_0.98, RSID = "NULL")
+egger_1<-egger_radial(IPF_IVW0.98, alpha = 0.05, weights = 1, summary = T)
+egger_1$confint
+#coef = 0.007250061, se = 0.006444691, 95% CI =(-0.005381402, 0.019881524), Rucker's  Q = 155862.6, p = 9.059645e-14 
+
+egger_2<-egger_radial(IPF_IVW0.98, alpha = 0.05, weights = 2, summary = T)
+egger_2$confint
+#coef = 0.001309174, se = 0.003231441, 95% CI =(-0.005024385, 0.007642732), Rucker's  Q = 38097.42, p = 1
+
+egger_3<-egger_radial(IPF_IVW0.98, alpha = 0.05, weights = 3, summary = T)
+egger_3$confint
+#coef = 0.007249888, se = 0.006444697, 95% CI =(-0.005381588, 0.019881363), Rucker's  Q = 155859, p = 9.638136e-14
+
+###Corrected beta
+IPF_IVW0.98_betacor<-format_radial(beta_0.98cor, coef_0.98, se.beta_0.98, se.coef_0.98, RSID = "NULL")
+ivw_radial(IPF_IVW0.98_betacor, alpha = 0.05, weights = 1, tol = 0.0001, summary = T)
+#1st order weights. Iterative:   effect: 0.004709881, SE: 0.003948538
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006484958
+#                   Exact (RE):  effect: 2.064734935, SE: 0.027745985
+egger_1<-egger_radial(IPF_IVW0.98_betacor, alpha = 0.05, weights = 1, summary = T)
+egger_1$confint
+#coef = -0.009196658, se = 0.006444545, 95% CI =(-0.021827834, 0.003434519), Rucker's  Q = 155855.5, p = 9.95525e-14
+
+ivw_radial(IPF_IVW0.98_betacor, alpha = 0.05, weights = 2, tol = 0.0001, summary = T)
+#2nd order weights. Iterative:   effect: 0.004709881, SE: 0.003948538
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006484958
+#                   Exact (RE):  effect: 2.064734935, SE: 0.027567499
+egger_2<-egger_radial(IPF_IVW0.98_betacor, alpha = 0.05, weights = 2, summary = T)
+egger_2$confint
+#coef = -0.002544861, se = 0.003231348, 95% CI =(-0.008878237, 0.003788515), Rucker's  Q = 38095.23, p = 1
+
+ivw_radial(IPF_IVW0.98_betacor, alpha = 0.05, weights = 3, tol = 0.0001, summary = T)
+#Modified 2nd order weights.  Iterative:   effect: 0.004709881, SE: 0.003948538
+#                             Exact (FE):  effect:  1.999939717, SE: 0.006484958
+#                             Exact (RE):  effect: 2.064734935, SE: 0.030495851
+egger_3<-egger_radial(IPF_IVW0.98_betacor, alpha = 0.05, weights = 3, summary = T)
+egger_3$confint
+#coef = -0.009195408, se = 0.006444555, 95% CI =(-0.02182660, 0.00343579), Rucker's  Q = 155849.7, p = 1.09056e-13
+
+
+#########Corrected coef
+IPF_IVW0.98_coefcor<-format_radial(beta_0.98, coef_0.98cor, se.beta_0.98, se.coef_0.98, RSID = "NULL")
+ivw_radial(IPF_IVW0.98_coefcor, alpha = 0.05, weights = 1, tol = 0.0001, summary = T)
+#1st order weights. Iterative:   effect: 0.004709881, SE: 0.003948538
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006484958
+#                   Exact (RE):  effect: 2.064734935, SE: 0.028090263  
+egger_1<-egger_radial(IPF_IVW0.98_coefcor, alpha = 0.05, weights = 1, summary = T)
+egger_1$confint
+#coef = -0.009196658, se = 0.006444555, 95% CI =(-0.021827834, 0.003434519), Rucker's  Q = 155855.5, p = 9.95525e-14
+
+ivw_radial(IPF_IVW0.98_coefcor, alpha = 0.05, weights = 2, tol = 0.0001, summary = T)
+#2nd order weights. Iterative:   effect: 0.004709881, SE: 0.003948538
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006484958
+#                   Exact (RE):  effect: 2.064734935, SE: 0.029624492
+egger_2<-egger_radial(IPF_IVW0.98_coefcor, alpha = 0.05, weights = 2, summary = T)
+egger_2$confint
+#coef = -0.002544861, se = 0.003231348, 95% CI =(-0.008878237, 0.003788515), Rucker's  Q = 38095.23, p = 1
+
+ivw_radial(IPF_IVW0.98_coefcor, alpha = 0.05, weights = 3, tol = 0.0001, summary = T)
+#Modified 2nd order weights.  Iterative:   effect: 0.004709881, SE: 0.003948538
+#                             Exact (FE):  effect:  1.999939717, SE: 0.006484958
+#                             Exact (RE):  effect: 2.064734935, SE: 0.029351611
+egger_3<-egger_radial(IPF_IVW0.98_coefcor, alpha = 0.05, weights = 3, summary = T)
+egger_3$confint
+#coef = -0.009195408, se = 0.006444555, 95% CI =(-0.02182660  0.00343579), Rucker's  Q = 155849.7, p =  1.09056e-13
+
+
+
+
+###########################################################################################
+#R-sq>0.99
+IPF_0.99 <- read.csv("C:/Users/caisy/Desktop/index event/IPF_prune0.99_noNA", sep="")
+attach(IPF_0.99)
+
+
+
+#Weighted linear regression
+test0.99<-glm(coef_0.99~beta_0.99)
+summary(test0.99)
+confint(test0.99, 'beta_0.99', level=0.95)
+#coef = -0.0083246, se = 0.0042658, CI= (-1.668537e-02, 3.626353e-05) without weights.
+#coef = 0.0020423, se = 0.0041335, CI= (-0.006059192, 0.010143848) with weights.
+
+
+test0.99<-glm(coef_0.99cor~beta_0.99, weights= 1/se.coef_0.99^2)
+summary(test0.99)#coef=0.0188707 without weights, coef=0.0147895 with weights, coef= 0.0077176 with weights se.coef
+confint(test0.99, 'beta_0.99', level=0.95)
+
+test0.99<-glm(coef_0.99~beta_0.99cor, weights= 1/se.coef_0.99^2)
+summary(test0.99)#coef=0.0178001 without weights, coef=0.0146484 with weights, coef= 0.0058181 with weights se.coef
+confint(test0.99, 'beta_0.99cor', level=0.95)
+
+
+
+#Index event package
+indexevent(beta_0.99,se.beta_0.99, coef_0.99,se.coef_0.99, weighted= FALSE) 
+#coef= -0.0992947471499134 with weights, coef= 0.404726540331872 without weights  
+
+indexevent(beta_0.99, se.beta_0.99, coef_0.99cor,se.coef_0.99) 
+#coef= -0.375487621049695 with weights, coef= -0.917726753804775 without weights
+
+indexevent(beta_0.99cor, se.beta_0.99, coef_0.99,se.coef_0.99)
+#coef= -0.283763075323209 with weights, coef= -0.867540457657102 without weights
+
+
+#SIMEX
+indexevent(beta_0.99,se.beta_0.99, coef_0.99,se.coef_0.99, method= "SIMEX", B=100, weighted = FALSE)
+#coef= 0.0153800011387026, se= 0.0203757551395869, 95% CI= (0.00834964922704522, 0.0882211416898396) weighted
+#coef= -99.9999206374459, se= 25.4978140729005, 95% CI= (-99.9999696862018, -0.0503751514348666) without the weights.
+
+indexevent(beta_0.99, se.beta_0.99, coef_0.99cor, se.coef_0.99, method= "SIMEX", B=100)
+#coef= 99.9999209787482, se= 25.1920712882837, 95% CI= (1.24884632017743, 99.9999511621805) weighted,
+#coef= 99.9999199478435, se= 25.4357112955575, 95% CI= (0.293794404143581, 99.9999505250464) without the weights.
+
+indexevent(beta_0.99cor, se.beta_0.99, coef_0.99, se.coef_0.99, method= "SIMEX", B=100)
+#coef= 0.533797836497209, se=25.4811993425086, 95% CI= (0.115466967061543, 99.9999329554665) weighted
+#coef= 0.12374577659095, se= 0.16053696736783, 95% CI= (0.0676395652243986, 0.696932913680857) without the weights.
+
+
+
+#Fast simex & HO
+new_simex(beta_0.99, se.beta_0.99, coef_0.99, se.coef_0.99, weighted= "1", method= "hedges-olkin", model = "ivw")
+# coef = -2.42341
+
+
+#Slope hunter upadted
+Sh0.99 <- hunt(dat = IPF_0.99, 
+               xbeta_col="beta_0.99", xse_col="se.beta_0.99", xp_col= "p.beta_0.99",
+               ybeta_col="coef_0.99", yse_col="se.coef_0.99", yp_col="p.coef_0.99",
+               xp_thresh = 0.05, Bootstrapping = TRUE, show_adjustments = TRUE, seed=2019)
+# coef = 0.390342569528662, se = 0.0652797075102713
+
+
+#MR-RAPS
+mr.raps(beta_0.99, coef_0.99, se.beta_0.99, se.coef_0.99, over.dispersion = TRUE)
+# coef = 80.57968, se = 148795.4
+
+
+
+
+#Radial IVW package
+
+IPF_IVW0.99_beta<-format_radial(beta_0.99, coef_0.99, se.beta_0.99, se.coef_0.99, RSID = "NULL")
+egger_1<-egger_radial(IPF_IVW0.99_beta, alpha = 0.05, weights = 1, summary = T)
+egger_1$confint
+#coef = 0.012122087, se = 0.006755431, 95% CI =(-0.00111843, 0.02536260), Rucker's  Q = 141676.5, p = 1.926461e-10
+
+egger_2<-egger_radial(IPF_IVW0.99_beta, alpha = 0.05, weights = 2, summary = T)
+egger_2$confint
+#coef = 0.002469877, se = 0.003388907, 95% CI =(-0.004172316, 0.009112070), Rucker's  Q = 34689.09, p = 1
+
+egger_3<-egger_radial(IPF_IVW0.99_beta, alpha = 0.05, weights = 3, summary = T)
+egger_3$confint
+#coef = 0.01212183, se = 0.006755449, 95% CI =(-0.001118723, 0.025362381), Rucker's  Q = 141676.5, p = 2.174547e-10
+
+
+###Corrected beta
+ivw_radial(IPF_IVW0.99_betacor, alpha = 0.05, weights = 1, tol = 0.0001, summary = T)
+#1st order weights. Iterative:   effect: 0.005723598, SE: 0.004132857
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006792841
+#                   Exact (RE):  effect: 2.067809250, SE: 0.024986762
+egger_1<-egger_radial(IPF_IVW0.99_betacor, alpha = 0.05, weights = 1, summary = T)
+egger_1$confint
+#coef = -0.001489888, se = 0.006755429, 95% CI =(-0.01473040, 0.01175062), Rucker's  Q = 141676.4, p = 1.926461e-10
+
+ivw_radial(IPF_IVW0.99_betacor, alpha = 0.05, weights = 2, tol = 0.0001, summary = T)
+#2nd order weights. Iterative:   effect: 0.005723598, SE: 0.004132857
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006792841
+#                   Exact (RE):  effect: 2.067809250, SE: 0.027411391
+egger_2<-egger_radial(IPF_IVW0.99_betacor, alpha = 0.05, weights = 2, summary = T)
+egger_2$confint
+#coef = 0.0005312557, se = 0.003388814, 95% CI =(-0.006110755, 0.007173267), Rucker's  Q = 34687.19, p = 1
+
+ivw_radial(IPF_IVW0.99_betacor, alpha = 0.05, weights = 3, tol = 0.0001, summary = T)
+#Modified 2nd order weights.  Iterative:   effect: 0.005723598 , SE: 0.004132857   
+#                             Exact (FE):  effect:  1.999939717, SE: 0.006792841 
+#                             Exact (RE):  effect: 2.067809250, SE: 0.024659918  
+egger_3<-egger_radial(IPF_IVW0.99_betacor, alpha = 0.05, weights = 3, summary = T)
+egger_3$confint
+#coef = -0.001489859, se = 0.006755429, 95% CI =(-0.01473037, 0.01175065), Rucker's  Q = 141676.3, p = 1.95324e-10
+
+##########Corrected coef
+IPF_IVW0.99_coefcor<-format_radial(beta_0.99, coef_0.99cor, se.beta_0.99, se.coef_0.99, RSID = "NULL")
+ivw_radial(IPF_IVW0.99_coefcor, alpha = 0.05, weights = 1, tol = 0.0001, summary = T)
+#1st order weights. Iterative:   effect: 0.005723598, SE: 0.004132857 
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006792841
+#                   Exact (RE):  effect: 2.067809250, SE: 0.021705181  
+egger_1<-egger_radial(IPF_IVW0.99_coefcor, alpha = 0.05, weights = 1, summary = T)
+egger_1$confint
+#coef = -0.001489888, se = 0.006755429, 95% CI =(-0.01473040, 0.01175062), Rucker's  Q = 141676.4, p = 1.926461e-10
+
+ivw_radial(IPF_IVW0.99_coefcor, alpha = 0.05, weights = 2, tol = 0.0001, summary = T)
+#2nd order weights. Iterative:   effect: 0.005723598, SE: 0.004132857 
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006792841
+#                   Exact (RE):  effect: 2.067809250, SE: 0.023182697 
+egger_2<-egger_radial(IPF_IVW0.99_coefcor, alpha = 0.05, weights = 2, summary = T)
+egger_2$confint
+#coef = 0.0005312557, se = 0.003388814, 95% CI =(-0.006110755, 0.007173267), Rucker's  Q = 34687.19, p = 1
+
+ivw_radial(IPF_IVW0.99_coefcor, alpha = 0.05, weights = 3, tol = 0.0001, summary = T)
+#Modified 2nd order weights.  Iterative:   effect: 0.005723598, SE: 0.004132857 
+#                   Exact (FE):  effect: 1.999939717, SE: 0.006792841
+#                   Exact (RE):  effect: 2.067809250, SE: 0.025789994 
+egger_3<-egger_radial(IPF_IVW0.99_coefcor, alpha = 0.05, weights = 3, summary = T)
+egger_3$confint
+#coef = -0.001489859, se = 0.006755429, 95% CI =(-0.01473037, 0.01175065), Rucker's  Q = 141676.3, p = 1.95324e-10
+
+
+###################################################################################################################
+IPF_0.9 <- read.csv("C:/Users/caisy/Desktop/index event/IPF_prune0.9_noNA", sep="")
+attach(IPF_0.9)
+
+#Linear regression
+testr0.9<-glm(coef_0.9 ~ beta_0.9, weights = 1/se.coef_0.9^2)
+summary(testr0.9)
+#coef = 0.0211876, se = 0.0044507 without weights
+#coef = 0.0084872, se = 0.0031977 with weights
+
+#index event
+indexevent(beta_0.9, se.beta_0.9, coef_0.9, se.coef_0.9) 
+#coef = 0.487088779820546 without weights
+#coef = 0.195116021004511 with weights
+
+#SIMEX
+indexevent(beta_0.9, se.beta_0.9, coef_0.9, se.coef_0.9, method = "SIMEX", B=100, weighted = FALSE) 
+#coef = 0.696746769260536, se = 25.4708626184247, CI = (0.155987173762865, 99.9999339483229) without weights
+#coef = 0.609520092013419, se = 25.4603146274727, CI = (0.197334848940541, 99.9999342587502) with weights
+
+
+#Fast simex & HO
+new_simex(beta_0.9, se.beta_0.9, coef_0.9, se.coef_0.9, weighted= "1", method= "hedges-olkin", model = "ivw")
+# coef = 0.7113961
+
+
+#Slope hunter updated
+Sh0.9 <- hunt(dat = IPF_0.9, 
+               xbeta_col="beta_0.9", xse_col="se.beta_0.9", xp_col= "p.beta_0.9",
+               ybeta_col="coef_0.9", yse_col="se.coef_0.9", yp_col="p.coef_0.9",
+               xp_thresh = 0.05, Bootstrapping = TRUE, show_adjustments = TRUE, seed=2019)
+# coef = 0.239956351719515, se = 0.0566031339993433
+
+
+#MR-RAPS
+mr.raps(beta_0.9, coef_0.9, se.beta_0.9, se.coef_0.9, over.dispersion = TRUE)
+# coef = 18.43267, se = 403.708
+
+
+#MR-Egger
+IPF_IVW0.9<-format_radial(beta_0.9, coef_0.9, se.beta_0.9, se.coef_0.9, RSID = "NULL")
+egger_1<-egger_radial(IPF_IVW0.9, alpha = 0.05, weights = 1, summary = T)
+egger_1$confint
+#coef = 0.016000334, se = 0.005189470, CI = (0.005829109, 0.026171559)
+
+egger_2<-egger_radial(IPF_IVW0.9, alpha = 0.05, weights = 2, summary = T)
+egger_2$confint
+#coef = 0.007333196, se = 0.002586667, CI = (0.002263396, 0.012402996)
+
+egger_3<-egger_radial(IPF_IVW0.9, alpha = 0.05, weights = 3, summary = T)
+egger_3$confint
+#coef = 0.015998953, se = 0.005189507, CI = (0.005827656 0.026170250)
+
