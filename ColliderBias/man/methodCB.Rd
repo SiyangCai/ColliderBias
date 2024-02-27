@@ -58,8 +58,8 @@ this function adjusts the statistics for the subsequent trait for selection bias
 Effect sizes are on a linear scale, so could be the coefficients from linear regression, or log odds ratios, or log hazard ratios.
 Effects on the subsequent trait are regressed on the effects on the index trait.
 By default, the regression is weighted by the inverse variances of the subsequent trait effects, so users are recommended to use the default \code{weighted = "1"}. Other weight options are developed for any potential application from the user.
-The regression is firstly adjusted for weak instrument bias through the \code{method},
-and the residuals are then used to obtain adjusted effect sizes and standard errors for the subsequent trait to correct for collider bias.
+The regression coefficient is firstly adjusted for weak instrument bias through the \code{method},
+and the residuals are then used to obtain adjusted effect sizes and standard errors for the subsequent trait to correct for collider bias. Such an approach is called instrumental effect regression.
 
 The regression should be performed on a subset of predictors that are independent.
 In the context of a genome-wide association study, these would be LD-pruned SNPs.
@@ -67,6 +67,16 @@ In terms of the input parameters, the regression command is \code{lm(ybeta[prune
 
 The effects in \code{xbeta} and \code{ybeta} should be aligned for the same variables
 and the same direction prior to running the adjustment using this package.
+}
+\examples{
+# Load the test dataset
+data(testData)
+
+# Adjust for collider bias using instrumental effect regression, and weak instrument bias using CWLS.
+methodCB(testData$dbeta, testData$dse, testData$ybeta, testData$yse, method = "CWLS")
+
+
+
 }
 \references{
 Cai S, Hartley A, Mahmoud O, Tilling K, Dudbridge F. Adjusting for collider bias in genetic association studies using instrumental variable methods. Genet Epidemiol. 2022;46:303–16.

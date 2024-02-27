@@ -9,5 +9,4 @@ Encoding: UTF-8
 License: GPL-3
 LazyData: true
 RoxygenNote: 7.2.3
-Imports: mr.raps, SlopeHunter
-Suggests: mr.raps, SlopeHunter
+Imports: mr.raps, SlopeHunter, boot

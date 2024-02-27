@@ -1,0 +1,25 @@
+#' @title Sample simulated genome-wide association study (GWAS) summary statisitcs for analysis.
+#'
+#' @description A simple \code{data_frame} that contains genetic summary data with three traits for example showcases, An exposure X, a disease incidence trait D and a disease progression trait Y.
+#' Data contains 10,000 independent SNPs under Hardy-Weinberg equilibrium with minor allele frequencies drawn uniformly from (0.01, 0.49).
+#' All SNPs had independent effects on both X and D and also directly on the outcome Y to create invalid instruments. SNP effects,
+#' confounders and residual variation in exposure X and disease trait D were then drawn independently from normal distributions,
+#' assuming no genetic effects between disease trait and exposure.
+#' Variance explained by non-genetic confounders is fixed as 20\%.
+#' The heritability takes values of 30\% for all three traits.
+#' The true causal effect between the exposure of interest and the disease progression (outcome) is 0.4.
+#'
+#'
+#' @format A \code{data_frame} with six columns
+#' \describe{
+#'      \item{xbeta}{A list of SNP-exposure effects given a random exposure of our interest.}
+#'      \item{xse}{Standard errors of SNP-exposure effects.}
+#'      \item{dbeta}{A list of SNP-disease effects.}
+#'      \item{dse}{Standard errors of SNP-disease effects.}
+#'      \item{ybeta}{A list of SNP-outcome effects.}
+#'      \item{yse}{Standard errors of SNP-outcome effects.}
+#'
+#' }
+#'
+
+"testData"

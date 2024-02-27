@@ -22,6 +22,18 @@ An object of class "methodCB" which contains:
 This function is designed for adjusting collider bias and weak instrument bias to estimate unbiased causal effect between an exposure trait and disease progression trait,
 using two-step regression and CWLS/MR-RAPS adjustment.
 }
+\examples{
+
+# Load the test dataset
+data(testData)
+
+# Find the true causal between exposure and disease progression, using two-step regression with CWLS.
+TwoSteps(testData, method = "cwls")
+
+# Similarly, we can replace the method by MR-RAPS. But note that we are using invalid instrument so over-dispersion needs to be considered.
+TwoSteps(testData, method = "mr.raps", od = TRUE)
+
+}
 \references{
 Cai S, Hartley A, Mahmoud O, Tilling K, Dudbridge F. Adjusting for collider bias in genetic association studies using instrumental variable methods. Genet Epidemiol. 2022;46:303–16.
 

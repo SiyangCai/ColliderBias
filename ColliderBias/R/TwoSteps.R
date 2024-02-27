@@ -17,6 +17,17 @@
 #'     \item{\code{b.se} Standard error of \code{b}}
 #'   }
 #'
+#' @examples
+#'
+#' # Load the test dataset
+#' data(testData)
+#'
+#' # Find the true causal between exposure and disease progression, using two-step regression with CWLS.
+#' TwoSteps(testData, method = "cwls")
+#'
+#' # Similarly, we can replace the method by MR-RAPS. But note that we are using invalid instrument so over-dispersion needs to be considered.
+#' TwoSteps(testData, method = "mr.raps", od = TRUE)
+#'
 #' @author Siyang Cai, Frank Dudbridge
 #'
 #' @references
@@ -26,7 +37,7 @@
 #'
 #' @export
 TwoSteps = function(data, method, od = FALSE){
-    if(method == "cwls"){
+    if(tolower(method) == "cwls"){
         bts = function(data, i = c(1:length(data()))){
 
             data = data[i,]
@@ -44,7 +55,7 @@ TwoSteps = function(data, method, od = FALSE){
         b.se = sd(res$t)
     }
 
-    if(method == "mr.raps") {
+    if(tolower(method) == "mr.raps") {
         mr.raps_dy = methodCB(data$dbeta, data$dse, data$ybeta, data$yse, method = "mr.raps", od = od)
 
         mr.raps_xy = methodCB(data$xbeta, data$xse, mr.raps_dy$ybeta.adj, mr.raps_dy$yse.adj, method = "mr.raps", od = od)
