@@ -13,10 +13,7 @@ methodCB(
   method,
   weighted = "1",
   model = "ivw",
-  B = 100,
-  lambda = seq(0.25, 5, 0.25),
-  od = FALSE,
-  seed = 0
+  od = FALSE
 )
 }
 \arguments{
@@ -30,20 +27,14 @@ methodCB(
 
 \item{prune}{Vector containing the indices of an approximately independent subset of the predictors in \code{xbeta} and \code{ybeta}. If unspecified, all predictors will be used.}
 
-\item{method}{Method to adjust for regression dilution in the regression of \code{ybeta[prune]} on \code{xbeta[prune]}.
-"CWLS" applies corrected weighted least squares estimator, "Fast" applies the fast version of CWLS, "SH" applies Slope Hunter and "mr.raps" applies MR-RAPS.}
+\item{method}{Method to adjust for weak instrument bias in the regression of \code{ybeta[prune]} on \code{xbeta[prune]}.
+"CWLS" applies Corrected Weighted Least Squares estimator, "SH" applies Slope Hunter and "mr.raps" applies MR-RAPS.}
 
-\item{weighted}{Weights to be used in raw regression, Fast SIMEX and Hedges-Olkin adjustment. Default is using "1" as the first order weight, while "0" indicates unweighted model and "2" applies second order weight.}
+\item{weighted}{Weights to be used in raw regression and CWLS. Default is using "1" as the first order weight, while "0" indicates unweighted model and "2" applies second order weight.}
 
-\item{model}{Rgression model to be used in raw regression, Fast SIMEX and Hedges-Olkin adjustment. Default is "IVW" and could be replaced by "Egger" to use MR-Egger model.}
-
-\item{B}{Number of simulations performed in each stage of the Fast SIMEX adjustment.}
-
-\item{lambda}{Vector of lambdas for which the Fast SIMEX simulations are performed.}
+\item{model}{Regression model to be used in raw regression and CWLS . Default is "IVW" and could be replaced by "Egger" to use MR-Egger model.}
 
 \item{od}{Whether to use "over.dispersion" in MR-RAPS.}
-
-\item{seed}{Random number seed for the Fast SIMEX adjustment.}
 }
 \value{
 An object of class "methodCB" which contains:
@@ -66,18 +57,16 @@ this function adjusts the statistics for the subsequent trait for selection bias
 \details{
 Effect sizes are on a linear scale, so could be the coefficients from linear regression, or log odds ratios, or log hazard ratios.
 Effects on the subsequent trait are regressed on the effects on the index trait.
-By default, the regression is weighted by the inverse variances of the subsequent trait effects.
-The regression is adjusted for sampling variation in the index trait effects,
-and the residuals then used to obtain adjusted effect sizes and standard errors for the subsequent trait.
+By default, the regression is weighted by the inverse variances of the subsequent trait effects, so users are recommended to use the default \code{weighted = "1"}. Other weight options are developed for any potential application from the user.
+The regression is firstly adjusted for weak instrument bias through the \code{method},
+and the residuals are then used to obtain adjusted effect sizes and standard errors for the subsequent trait to correct for collider bias.
 
 The regression should be performed on a subset of predictors that are independent.
 In the context of a genome-wide association study, these would be LD-pruned SNPs.
 In terms of the input parameters, the regression command is \code{lm(ybeta[prune]~xbeta[prune],weights=1/yse[prune]^2)}.
 
 The effects in \code{xbeta} and \code{ybeta} should be aligned for the same variables
-and the same direction prior to running \code{indexevent}.
-
-The default value of \code{B} is 100 to get a quick result, but higher values are recommended, eg 10000.
+and the same direction prior to running the adjustment using this package.
 }
 \references{
 Cai S, Hartley A, Mahmoud O, Tilling K, Dudbridge F. Adjusting for collider bias in genetic association studies using instrumental variable methods. Genet Epidemiol. 2022;46:303–16.

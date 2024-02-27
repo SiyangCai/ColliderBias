@@ -5,31 +5,27 @@
 #'
 #' Effect sizes are on a linear scale, so could be the coefficients from linear regression, or log odds ratios, or log hazard ratios.
 #' Effects on the subsequent trait are regressed on the effects on the index trait.
-#' By default, the regression is weighted by the inverse variances of the subsequent trait effects.
-#' The regression is adjusted for sampling variation in the index trait effects,
-#' and the residuals then used to obtain adjusted effect sizes and standard errors for the subsequent trait.
+#' By default, the regression is weighted by the inverse variances of the subsequent trait effects, so users are recommended to use the default \code{weighted = "1"}. Other weight options are developed for any potential application from the user.
+#' The regression is firstly adjusted for weak instrument bias through the \code{method},
+#' and the residuals are then used to obtain adjusted effect sizes and standard errors for the subsequent trait to correct for collider bias.
 #'
 #' The regression should be performed on a subset of predictors that are independent.
 #' In the context of a genome-wide association study, these would be LD-pruned SNPs.
 #' In terms of the input parameters, the regression command is \code{lm(ybeta[prune]~xbeta[prune],weights=1/yse[prune]^2)}.
 #'
 #' The effects in \code{xbeta} and \code{ybeta} should be aligned for the same variables
-#' and the same direction prior to running \code{indexevent}.
+#' and the same direction prior to running the adjustment using this package.
 #'
-#' The default value of \code{B} is 100 to get a quick result, but higher values are recommended, eg 10000.
 
 #' @param xbeta Vector of effects on the index trait.
 #' @param xse Vector of standard errors of \code{xbeta}.
 #' @param ybeta Vector of effects on the subsequent trait.
 #' @param yse Vector of standard errors of \code{ybeta}.
 #' @param prune Vector containing the indices of an approximately independent subset of the predictors in \code{xbeta} and \code{ybeta}. If unspecified, all predictors will be used.
-#' @param method Method to adjust for regression dilution in the regression of \code{ybeta[prune]} on \code{xbeta[prune]}.
-#' "CWLS" applies corrected weighted least squares estimator, "Fast" applies the fast version of CWLS, "SH" applies Slope Hunter and "mr.raps" applies MR-RAPS.
-#' @param weighted Weights to be used in raw regression, Fast SIMEX and Hedges-Olkin adjustment. Default is using "1" as the first order weight, while "0" indicates unweighted model and "2" applies second order weight.
-#' @param model Rgression model to be used in raw regression, Fast SIMEX and Hedges-Olkin adjustment. Default is "IVW" and could be replaced by "Egger" to use MR-Egger model.
-#' @param B Number of simulations performed in each stage of the Fast SIMEX adjustment.
-#' @param lambda Vector of lambdas for which the Fast SIMEX simulations are performed.
-#' @param seed Random number seed for the Fast SIMEX adjustment.
+#' @param method Method to adjust for weak instrument bias in the regression of \code{ybeta[prune]} on \code{xbeta[prune]}.
+#' "CWLS" applies Corrected Weighted Least Squares estimator, "SH" applies Slope Hunter and "mr.raps" applies MR-RAPS.
+#' @param weighted Weights to be used in raw regression and CWLS. Default is using "1" as the first order weight, while "0" indicates unweighted model and "2" applies second order weight.
+#' @param model Regression model to be used in raw regression and CWLS . Default is "IVW" and could be replaced by "Egger" to use MR-Egger model.
 #' @param od Whether to use "over.dispersion" in MR-RAPS.
 #'
 #'
@@ -66,10 +62,7 @@ methodCB = function (xbeta,
                       method,
                       weighted = "1",
                       model = "ivw",
-                      B = 100,
-                      lambda = seq(0.25, 5, 0.25),
-                      od = FALSE,
-                      seed = 0)
+                      od = FALSE)
 
 {
   if (is.null(prune)){
@@ -119,118 +112,6 @@ methodCB = function (xbeta,
     b.se = b.raw.se * ho
     b.ci = c(b - qnorm(0.975) * b.se, b + qnorm(0.975) * b.se)
     simex.estimates = NULL
-  }
-
-
-  if(tolower(method) == "fast"){
-    if(tolower(model) == "egger"){
-      simex.estimates = fit$coef[2]
-      simex.variance.sandwich = sandwich::vcovHC(fit)[2,2]
-
-      sum.weight.weight <- sum(weight) * weight
-      sum.ybeta <- sum(weight * ybetaprune)
-
-      ho = (sum(weight, na.rm = TRUE) * sum(weight * xbetaprune ^ 2, na.rm = TRUE) - (sum(weight * xbetaprune, na.rm = TRUE)) ^ 2) /
-        (sum(weight, na.rm = TRUE) * sum(weight * xbetaprune ^ 2, na.rm = TRUE) - (sum(weight * xbetaprune, na.rm = TRUE)) ^ 2 - sum(weight) * sum(weight * xseprune ^ 2, na.rm = TRUE))
-      slope.ho = b.raw * ho
-      m = length(xbetaprune)
-
-      progress = txtProgressBar(max = length(lambda), width = 10, style = 3)
-
-      set.seed(seed)
-
-      for(l in 1:length(lambda)) {
-        # simulate matrix of xbeta + sampling errors
-        simex.errors <- matrix(rnorm(m*B, mean= xbetaprune, sd = xseprune * sqrt(lambda[l])), nrow = m, ncol = B)
-        weight.simex.errors <- weight %*% simex.errors
-
-        simex.numer <- (sum.weight.weight * ybetaprune) %*% simex.errors - weight.simex.errors * sum.ybeta
-        simex.denom <- sum.weight.weight %*% simex.errors^2 - weight.simex.errors^2
-        simexcoef <- simex.numer / simex.denom
-
-        # take their mean
-        simex.estimates = c(simex.estimates, mean(simexcoef))
-
-        setTxtProgressBar(progress, l)
-      }
-
-      set.seed(seed)
-
-      for(l in 1:length(lambda)){
-        simexdata = rnorm(length(xbetaprune), mean = xbetaprune, sd = xseprune * sqrt(lambda[l]))
-        simexfit = lm(ybetaprune ~ simexdata, weights = weight)
-        svar = sandwich::vcovHC(simexfit)[2,2]
-
-        simex.variance.sandwich = c(simex.variance.sandwich, svar/B)
-        setTxtProgressBar(progress, l)
-      }
-
-
-      simex.estimates <- cbind(c(0,lambda), simex.estimates, simex.variance.sandwich)
-      colnames(simex.estimates) <- c("Lambda", "Coefficient", "Variance")
-      rownames(simex.estimates) <- NULL
-
-      simexMLE.fast = nlm(simexllhdbivariate, c(slope.ho ,log(ho-1)), simex.estimates = simex.estimates)
-
-
-      b = simexMLE.fast$estimate[1]
-
-      h = numDeriv::hessian(simexllhdbivariate, simexMLE.fast$estimate, simex.estimates = simex.estimates)
-      h.inv = solve(h)
-      b.se = sqrt(h.inv[1,1])
-      b.ci = c(b - qnorm(0.975) * b.se, b + qnorm(0.975) * b.se)
-    }
-
-    if(tolower(model) == "ivw"){
-      simex.estimates = fit$coef
-      simex.variance.sandwich = sandwich::vcovHC(fit)
-      m = length(xbetaprune)
-
-      ho = sum(weight * xbetaprune ^ 2, na.rm = TRUE) /
-        (sum(weight * xbetaprune ^ 2, na.rm = TRUE) - sum(weight * xseprune ^ 2, na.rm = TRUE))
-      slope.ho = b.raw * ho
-
-      progress = txtProgressBar(max = length(lambda), width = 10, style = 3)
-
-      set.seed(seed)
-      for(l in 1:length(lambda)) {
-        # simulate matrix of xbeta + sampling errors
-        simex.errors <- matrix(rnorm(m*B, mean= xbetaprune, sd = xseprune * sqrt(lambda[l])), nrow = m, ncol = B)
-
-        simex.numer <- (weight * ybetaprune) %*% simex.errors
-        simex.denom <- weight %*% simex.errors ^ 2
-        simexcoef <- simex.numer / simex.denom
-
-        # take their mean
-        simex.estimates = c(simex.estimates, mean(simexcoef))
-
-        setTxtProgressBar(progress, l)
-      }
-
-      set.seed(seed)
-      for(l in 1:length(lambda)){
-        simexdata = rnorm(length(xbetaprune), mean = xbetaprune, sd = xseprune * sqrt(lambda[l]))
-        simexfit = lm(ybetaprune ~ simexdata - 1, weights = weight)
-        svar = sandwich::vcovHC(simexfit)[1,1]
-
-        simex.variance.sandwich = c(simex.variance.sandwich, svar/B)
-
-        setTxtProgressBar(progress, l)
-      }
-
-
-      simex.estimates <- cbind(c(0,lambda), simex.estimates, simex.variance.sandwich)
-      colnames(simex.estimates) <- c("Lambda", "Coefficient", "Variance")
-      rownames(simex.estimates) <- NULL
-
-      simexMLE.fast <- nlm(simexllhdbivariate, c(slope.ho, log(ho - 1)), simex.estimates = simex.estimates)
-      b = simexMLE.fast$estimate[1] #-0.3354914
-
-      h <- numDeriv::hessian(simexllhdbivariate, simexMLE.fast$estimate, simex.estimates = simex.estimates)
-      h.inv <- solve(h)
-      b.se = sqrt(h.inv[1,1])
-      b.ci = c(b - qnorm(0.975) * b.se, b + qnorm(0.975) * b.se)
-    }
   }
 
   if(tolower(method) == "sh"){
