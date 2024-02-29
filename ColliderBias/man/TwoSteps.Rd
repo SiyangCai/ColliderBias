@@ -2,7 +2,7 @@
 % Please edit documentation in R/TwoSteps.R
 \name{TwoSteps}
 \alias{TwoSteps}
-\title{Adjust causal effect for collider bias in disease progression}
+\title{Estimate true causal effect in bivariate Mendelian randomization to adjust for collider bias and weak instrument bias.}
 \usage{
 TwoSteps(data, method, od = FALSE)
 }
@@ -20,7 +20,7 @@ An object of class "methodCB" which contains:
 }
 \description{
 This function is designed for adjusting collider bias and weak instrument bias to estimate unbiased causal effect between an exposure trait and disease progression trait,
-using two-step regression and CWLS/MR-RAPS adjustment.
+using two-step regression and CWLS/MR-RAPS adjustment in bivariate Mendelian randomization.
 }
 \examples{
 

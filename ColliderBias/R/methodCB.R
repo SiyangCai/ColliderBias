@@ -1,4 +1,4 @@
-#' Adjust association statistics for collider bias and weak instrument bias
+#' Adjust association statistics for collider bias and weak instrument bias in Mendelian randomization.
 #'
 #' Given effect sizes and standard errors for predictors of an index trait and a subsequent trait,
 #' this function adjusts the statistics for the subsequent trait for selection bias through the index trait.

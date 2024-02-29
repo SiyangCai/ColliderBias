@@ -1,7 +1,7 @@
-#' Adjust causal effect for collider bias in disease progression
+#' Estimate true causal effect in bivariate Mendelian randomization to adjust for collider bias and weak instrument bias.
 #'
 #'This function is designed for adjusting collider bias and weak instrument bias to estimate unbiased causal effect between an exposure trait and disease progression trait,
-#'using two-step regression and CWLS/MR-RAPS adjustment.
+#'using two-step regression and CWLS/MR-RAPS adjustment in bivariate Mendelian randomization.
 
 
 #' @param data A data frame ofinput dataset. This dataset should contain following columns: \code{xbeta} and \code{xse} represents the effects of exposure trait and its standard errors, \code{dbeta} and \code{dse} represents the effects of disease trait and its standard errors, \code{ybeta} and \code{yse} represents the effects of disease progression trait and its standard errors

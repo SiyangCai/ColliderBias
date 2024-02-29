@@ -2,7 +2,7 @@
 % Please edit documentation in R/methodCB.R
 \name{methodCB}
 \alias{methodCB}
-\title{Adjust association statistics for collider bias and weak instrument bias}
+\title{Adjust association statistics for collider bias and weak instrument bias in Mendelian randomization.}
 \usage{
 methodCB(
   xbeta,
