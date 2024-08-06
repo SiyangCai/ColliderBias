@@ -4,7 +4,7 @@
 # and its confidence interval
 #
 #' @export
-print.methodCB = function(x) {
+print.methodCB = function(x, ...) {
   print(paste("Coefficient",x$b))
   print(paste("Standard error",x$b.se))
   print(paste("95% CI",x$b.ci[1],x$b.ci[2]))
