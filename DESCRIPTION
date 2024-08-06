@@ -2,7 +2,7 @@ Type: Package
 Package: ColliderBias
 Title: Adjust collider bias and weak instrument bias in Mendelian
     Randomisation
-Version: 1.0.0
+Version: 1.0.1
 Author: Frank Dudbridge, Siyang Cai
 Maintainer: Frank Dudbridge <frank.dudbridge@leicester.ac.uk>, Siyang Cai
     <sc814@leicester.ac.uk>
