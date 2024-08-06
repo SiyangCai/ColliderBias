@@ -13,6 +13,7 @@ Description: This package provides adjustment for collider bias and weak
     estimation of true causal effect between disease progression and an
     exposure of interest can be computed using two-step regression.
 License: GPL-3
+URL: https://github.com/SiyangCai/ColliderBias
 Depends:
     R (>= 3.5)
 Imports: 
