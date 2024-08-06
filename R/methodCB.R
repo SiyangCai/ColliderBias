@@ -149,7 +149,7 @@ methodCB = function (xbeta,
   ybeta.adj = ybeta - b * xbeta
   yse.adj = sqrt(yse ^ 2 + b ^ 2 * xse ^ 2)
   ychisq.adj = (ybeta.adj / yse.adj) ^ 2
-  yp.adj = pchisq(ychisq.adj, 1, lower = F)
+  yp.adj = stats::pchisq(ychisq.adj, 1, lower.tail = FALSE)
   results = list(
     ybeta.adj = ybeta.adj,
     yse.adj = yse.adj,
