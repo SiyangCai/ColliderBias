@@ -162,6 +162,6 @@ methodCB = function (xbeta,
     b.raw = b.raw,
     b.raw.se = b.raw.se
   )
-  class(results) = ("methodCB")
+  class(results) = "methodCB"
   results
 }
