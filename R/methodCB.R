@@ -48,7 +48,8 @@
 #' # Load the test dataset
 #' data(testData)
 #'
-#' # Adjust for collider bias using instrumental effect regression, and weak instrument bias using CWLS.
+#' # Adjust for collider bias using instrumental effect regression,
+#' # and weak instrument bias using CWLS.
 #' methodCB(testData$dbeta, testData$dse, testData$ybeta, testData$yse, method = "CWLS")
 #'
 #'
