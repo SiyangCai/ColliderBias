@@ -10,6 +10,8 @@ TwoSteps(data, method, od = FALSE)
 \item{data}{A data frame ofinput dataset. This dataset should contain following columns: \code{xbeta} and \code{xse} represents the effects of exposure trait and its standard errors, \code{dbeta} and \code{dse} represents the effects of disease trait and its standard errors, \code{ybeta} and \code{yse} represents the effects of disease progression trait and its standard errors}
 
 \item{method}{Adjustment method in each step to correct for collider bias and weak instrument bias. Choose from \code{cwls} and \code{mr.raps}. If MR-RAPS is used, an argument \code{od = TRUE} is needed if invalid instruments are used.}
+
+\item{od}{Whether to use "over.dispersion" in MR-RAPS.}
 }
 \value{
 An object of class "methodCB" which contains:
