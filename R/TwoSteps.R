@@ -6,7 +6,7 @@
 
 #' @param data A data frame ofinput dataset. This dataset should contain following columns: \code{xbeta} and \code{xse} represents the effects of exposure trait and its standard errors, \code{dbeta} and \code{dse} represents the effects of disease trait and its standard errors, \code{ybeta} and \code{yse} represents the effects of disease progression trait and its standard errors
 #' @param method Adjustment method in each step to correct for collider bias and weak instrument bias. Choose from \code{cwls} and \code{mr.raps}. If MR-RAPS is used, an argument \code{od = TRUE} is needed if invalid instruments are used.
-#'
+#' @param od Whether to use "over.dispersion" in MR-RAPS.
 #'
 #' @import stats
 #'
@@ -22,10 +22,12 @@
 #' # Load the test dataset
 #' data(testData)
 #'
-#' # Find the true causal between exposure and disease progression, using two-step regression with CWLS.
+#' # Find the true causal between exposure and disease progression,
+#' # using two-step regression with CWLS.
 #' TwoSteps(testData, method = "cwls")
 #'
-#' # Similarly, we can replace the method by MR-RAPS. But note that we are using invalid instrument so over-dispersion needs to be considered.
+#' # Similarly, we can replace the method by MR-RAPS.
+#' # But note that we are using invalid instrument so over-dispersion needs to be considered.
 #' TwoSteps(testData, method = "mr.raps", od = TRUE)
 #'
 #' @author Siyang Cai, Frank Dudbridge

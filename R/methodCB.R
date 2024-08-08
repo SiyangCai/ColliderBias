@@ -48,7 +48,8 @@
 #' # Load the test dataset
 #' data(testData)
 #'
-#' # Adjust for collider bias using instrumental effect regression, and weak instrument bias using CWLS.
+#' # Adjust for collider bias using instrumental effect regression,
+#' # and weak instrument bias using CWLS.
 #' methodCB(testData$dbeta, testData$dse, testData$ybeta, testData$yse, method = "CWLS")
 #'
 #'
@@ -149,7 +150,7 @@ methodCB = function (xbeta,
   ybeta.adj = ybeta - b * xbeta
   yse.adj = sqrt(yse ^ 2 + b ^ 2 * xse ^ 2)
   ychisq.adj = (ybeta.adj / yse.adj) ^ 2
-  yp.adj = pchisq(ychisq.adj, 1, lower = F)
+  yp.adj = stats::pchisq(ychisq.adj, 1, lower.tail = FALSE)
   results = list(
     ybeta.adj = ybeta.adj,
     yse.adj = yse.adj,
@@ -161,6 +162,6 @@ methodCB = function (xbeta,
     b.raw = b.raw,
     b.raw.se = b.raw.se
   )
-  class(results) = ("MRmethods")
+  class(results) = "methodCB"
   results
 }
