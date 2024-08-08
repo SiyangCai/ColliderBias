@@ -4,12 +4,12 @@
 #'using generalised instrumental effect regression and CWBLS adjustment in bivariate Mendelian randomization.
 
 
-#' @param data A data frame ofinput dataset. This dataset should contain following columns: \code{xbeta} and \code{xse} represents the effects of exposure trait and its standard errors, \code{dbeta} and \code{dse} represents the effects of disease trait and its standard errors, \code{ybeta} and \code{yse} represents the effects of disease progression trait and its standard errors.
+#' @param data A data frame of input dataset. This dataset should contain following columns: \code{xbeta} and \code{xse} represents the effects of exposure trait and its standard errors, \code{dbeta} and \code{dse} represents the effects of disease trait and its standard errors, \code{ybeta} and \code{yse} represents the effects of disease progression trait and its standard errors.
 #'
 #' @import stats
 #'
 #'
-#' @return An object of class "methodCB" which contains:
+#' @return An object of class "CWBLS" which contains:
 #'   \itemize{
 #'     \item{\code{b} The true causal estimate between exposure and disease progression}
 #'     \item{\code{b.se} Standard error of \code{b}}
