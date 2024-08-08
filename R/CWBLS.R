@@ -37,13 +37,13 @@ CWBLS = function(data){
   
     w = 1/ data$yse ^ 2
   
-    n_i = sum(w * data$dpse ^ 2) * sum(w * data$xbeta * data$ybeta)
+    n_i = sum(w * data$dse ^ 2) * sum(w * data$xbeta * data$ybeta)
   
-    d_i = sum(w * data$xbeta ^ 2) * sum(w * data$dpse ^ 2) + 
-      sum(w * data$xse ^ 2) * sum(w * data$dpbeta ^ 2) - sum(w * data$xse ^ 2) * sum(w * data$dpse ^ 2)
+    d_i = sum(w * data$xbeta ^ 2) * sum(w * data$dse ^ 2) + 
+      sum(w * data$xse ^ 2) * sum(w * data$dbeta ^ 2) - sum(w * data$xse ^ 2) * sum(w * data$dse ^ 2)
   
-    b = (sum(w * data$dpbeta ^ 2) * sum(w * data$xbeta * data$ybeta) - sum(w * data$dpbeta * data$xbeta) * sum(w * data$dpbeta * data$ybeta) - n_i)/
-      (sum(w * data$xbeta ^ 2) * sum(w * data$dpbeta ^ 2) - (sum(w * data$xbeta * data$dpbeta)) ^ 2 - d_i)
+    b = (sum(w * data$dbeta ^ 2) * sum(w * data$xbeta * data$ybeta) - sum(w * data$dbeta * data$xbeta) * sum(w * data$dbeta * data$ybeta) - n_i)/
+      (sum(w * data$xbeta ^ 2) * sum(w * data$dbeta ^ 2) - (sum(w * data$xbeta * data$dbeta)) ^ 2 - d_i)
   
     return(b)
   }
