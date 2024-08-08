@@ -11,7 +11,8 @@ Description: This package provides adjustment for collider bias and weak
     genome-wide association study for a subsequent event, using CWLS
     (Corrected Weighted Least Squares), MR-RAPS and Slope Hunter. An
     estimation of true causal effect between disease progression and an
-    exposure of interest can be computed using two-step regression.
+    exposure of interest can be computed using generalised instrument effect
+    regression with CWBLS (Corrected Weighted Bivariate Least Squares).
 License: GPL-3
 URL: https://github.com/SiyangCai/ColliderBias
 BugReports: https://github.com/SiyangCai/ColliderBias/issues/

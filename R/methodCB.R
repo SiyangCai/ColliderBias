@@ -119,7 +119,7 @@ methodCB = function (xbeta,
 
     b = b.raw * ho
     slope.ho = b
-    b.se = b.raw.se * ho
+    b.se = b.raw.se * abs(ho)
     b.ci = c(b - qnorm(0.975) * b.se, b + qnorm(0.975) * b.se)
     simex.estimates = NULL
   }
