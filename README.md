@@ -15,5 +15,11 @@ install_github("SiyangCai/ColliderBias")
 
 ## Usage
 This package includes two main functions to adjust for collider bias:
-1. `methodCB`. Given effect sizes and standard errors for predictors of an index trait and a subsequent trait, this function adjusts the statistics for the subsequent trait for selection bias and weak instrument bias through the index trait.
+1. `methodCB`. This function adjusts the statistics for the subsequent trait for selection bias and weak instrument bias through the index trait.
 2. `CWBLS`. This function is designed for adjusting collider bias and weak instrument bias to estimate unbiased causal effect between an exposure trait and disease progression trait conditioning on disease incidence, using generalised instrumental effect regression and CWBLS adjustment in bivariate Mendelian randomization.
+
+For both methods, we recommend using as much as independent instruments selected from original GWAS. This could be performed using PCA, or LD-pruning with high quality. 
+
+A simple example and simulated dataset is included in the package to provide guidance to the users.
+
+For more information, please refer to the help page in the R package.
