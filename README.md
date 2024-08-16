@@ -20,6 +20,20 @@ This package includes two main functions to adjust for collider bias:
 
 For both methods, we recommend using as much as independent instruments selected from original GWAS. This could be performed using PCA, or LD-pruning with high quality. For `methodCB`, one could use one-sample or two-sample design in MR, while using `CWBLS` requires at least exposure and disease GWAS are from two different samples.
 
-A simple example and simulated dataset is included in the package to provide guidance to the users.
+A simple example and simulated dataset is included in the package to provide guidance to the users. To run the example, 
+
+```
+library(ColliderBias)
+
+# Load the test dataset
+data(testData)
+
+# Adjust for collider bias using instrumental effect regression,
+# and weak instrument bias using CWLS.
+methodCB(testData$dbeta, testData$dse, testData$ybeta, testData$yse, method = "CWLS")
+
+# Find the true causal between exposure and disease progression.
+CWBLS(testData)
+```
 
 For more information, please refer to the help page in the R package.
