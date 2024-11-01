@@ -2,7 +2,7 @@
 
 This is the R package for CWLS (Corrected Weighted Least Squares) and CWBLS (Corrected Weighted Bivariate Least Squares), a designed method to adjust for collider bias in Mendelian Randomisation using summary statistics from GWAS studies.
 
-For details of our methods, please refer to our paper of [CWLS](https://pubmed.ncbi.nlm.nih.gov/35583096/). The paper of CWBLS is still under review.
+For details of our methods, please refer to our paper of [CWLS](https://pubmed.ncbi.nlm.nih.gov/35583096/) and [CWBLS](https://pubmed.ncbi.nlm.nih.gov/39445745/).
 
 
 ## Installation
